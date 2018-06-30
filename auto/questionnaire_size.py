@@ -11,23 +11,26 @@ def save_xml(filename, xml_code):
 
 
 #---------Перераспределение значений в табице------------
-        
+
+name = input ("Введите название исходного файла (не забудьте про формат): ") # name = "questionnaire_size_frames.csv"
+if name.endswith ('.csv') == True:
+    new_name = "new_" + name
+    name_sorted = "sorted_" + name
+else:
+    new_name = "new_" + name.split ('.')[0] + '.csv'
+    name_sorted = "sorted_" + name.split ('.')[0] + '.csv'
+xml_name = name.split ('.')[0] + '.xml'
+
 tax_class = input ("Введите таксономический класс: ")       #tax_class = 'размер' 
 meaning = input ("Введите типа значения (d, если значение исходное, и f -- если переносное) ")         #meaning = 'd'
 _lang_ = input ("Введите язык (полное название на русском): ")   #_lang_ = "английский"
-
-
-name = "questionnaire_size_frames.csv"
+#field = input ("Введите семантическое поле: ")
+field = '' #?
 
 f = open (name, 'r', encoding = 'utf-8')
 all_strings = f.read()
 f.close()
 strings = all_strings.split ("\n")
-
-
-
-
-field = '' #?
 
 d = {}
 for _lexeme_ in strings[0].split(";"):
@@ -36,7 +39,8 @@ for _lexeme_ in strings[0].split(";"):
 
 del (strings[0])
 
-f = open ('questionnaire_size.csv', 'a', encoding = 'utf-8')
+f = open (new_name, 'a', encoding = 'utf-8')
+#f = open ('questionnaire_size.csv', 'a', encoding = 'utf-8')
 f.write ("lexeme" + "\t" + "lang" + "\t" + "mframe" + "\t" + "trans" + "\t" + "frame" + "\t" + "tax_class" + "\t" + "field" + "\t" + "meaning" + "\t" + "usage" + "\n")
 
 i = 2
@@ -61,10 +65,12 @@ f.close()
 import pandas as pd
 
 def main():
-    df = pd.read_csv("file:///C:/Users/admin/Desktop/HSE/Разработка методов автоматического сбора лексико-типологических данных/nex.csv", sep='\t', index_col=False)
+    df = pd.read_csv(new_name, sep='\t', index_col=False)
+    #df = pd.read_csv("questionnaire_size.csv", sep='\t', index_col=False)
     df = df.sort_values(by=['field', 'frame', 'usage', 'lexeme', 'meaning'])
-    df.to_csv('questionnaire_size_sorted.csv', sep='\t', encoding = "utf-8")
-    
+    df.to_csv(name_sorted, sep='\t', encoding = "utf-8")
+    #df.to_csv('questionnaire_size_sorted.csv', sep='\t', encoding = "utf-8")    
+
 if __name__ ==  '__main__':
     main()
 
@@ -81,7 +87,7 @@ root.text = ""
 field = ET.SubElement (root, 'field')
 field.text = '' #string [7]
 
-f = open ('questionnaire_size_sorted.csv', 'r', encoding = 'utf-8')
+f = open (name_sorted, 'r', encoding = 'utf-8')
 all_strings = f.read()
 f.close()
 strings = all_strings.split ("\n")
@@ -115,4 +121,6 @@ for string in strings:
         mframe = ET.SubElement (lexeme, "mframe", attrib = {"trans":trans.text, "usage":usage.text})
         mframe.text = string [3]
 
-save_xml('questionnaire_size.xml', root)
+
+#save_xml('questionnaire_size.xml', root)
+save_xml(xml_name, root)
